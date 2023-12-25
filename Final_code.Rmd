@@ -1,0 +1,63 @@
+---
+title: "group6_project630"
+author: "Sagar Soneji, Roheet Bakare, Atish Panday "
+date: "2022-12-06"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1) Load the data and check for outliers 
+```{r}
+project <- read.csv("/Users/atishpanday/Downloads/CPU_r23_v2.csv")
+project$manufacturer <- as.factor(project$manufacturer)
+summary(project)
+```
+
+2) Linear regression model 
+```{r}
+mod <- lm(singleScore ~ turboClock, data = project)
+hist(project$singleScore, xlab = "Single Score", ylab = "Frequency", main = "Histogram of Single Score")
+hist(project$turboClock, xlab = "Turbo Clock Speed", ylab = "Frequency", main = "Histogram of Turbo Clock")
+```
+
+3) Check Conditions
+
+Linearity check
+```{r}
+library(ggplot2)
+ggplot(project, aes(x = turboClock, y = singleScore)) +
+  geom_point() +
+  geom_smooth(method = "lm", 
+              se = FALSE,
+              col = "red") + 
+  ggtitle(" Performance vs Boost speed") +
+  labs(x = "Boost speed", y = "Performance")
+```
+
+
+Constant variance check
+```{r}
+mod <- lm(singleScore ~ turboClock, data = project)
+plot(resid(mod) ~ mod$fitted.values)
+abline(h = 0, col = "red")
+```
+
+Normality check
+```{r}
+qqnorm(resid(mod))
+qqline(resid(mod), col = "red")
+```
+
+Secondary Discovery 
+```{r}
+ggplot(project, aes(x = turboClock, y = singleScore, col = manufacturer)) +
+  geom_point() +
+  ggtitle(" Performance vs Boost speed") +
+  labs(x = "Boost speed", y = "Performance") + scale_color_manual(breaks = c("AMD", "Apple", "Intel"),values=c("#9a2a2a", "black", "#1c6190"))
+```
+
